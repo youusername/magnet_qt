@@ -14,14 +14,6 @@ XTTableView::XTTableView(QWidget *parent)
     this->installEventFilter(this);
 }
 
-//void XTTableView::leftClicked(const QModelIndex &)//点击左键信号
-//{
-//     //qDebug() << "leftClicked";
-//}
-//void XTTableView::rightClicked(const QModelIndex &)//点击右键信号
-//{
-// //qDebug() << "leftClicked";
-//}
 void XTTableView::mousePressEvent(QMouseEvent * event)
 {
      setCurrentIndex(QModelIndex());//对当前索引的初始化，否则点击无效区域时会记录上一次的有效值

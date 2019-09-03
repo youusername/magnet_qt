@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>765</width>
-    <height>489</height>
+    <width>706</width>
+    <height>484</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,24 +20,93 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <layout class="QHBoxLayout" name="horizontalLayout_8">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QTableView" name="listTableView">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetFixedSize</enum>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>150</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
+        <item>
+         <widget class="QToolButton" name="toolButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>150</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>150</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>icon512.png</normaloff>icon512.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>100</width>
+            <height>100</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="XTTableView" name="listTableView">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>296</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="showDropIndicator" stdset="0">
+           <bool>true</bool>
+          </property>
+          <property name="gridStyle">
+           <enum>Qt::NoPen</enum>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line">
@@ -51,7 +120,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="searchText">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
               <horstretch>0</horstretch>
@@ -88,6 +157,12 @@
               <width>100</width>
               <height>36</height>
              </size>
+            </property>
+            <property name="contextMenuPolicy">
+             <enum>Qt::DefaultContextMenu</enum>
+            </property>
+            <property name="inputMethodHints">
+             <set>Qt::ImhNone</set>
             </property>
             <property name="text">
              <string>搜索</string>
