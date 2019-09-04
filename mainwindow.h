@@ -30,7 +30,12 @@
 #include <libxml/HTMLparser.h>
 #include <iconv.h>
 #include <QtXmlPatterns/QtXmlPatterns>
-
+#include <QWebEngineView>
+#include <QWebEnginePage>
+#include <QWebChannel>
+#include <QtCore/QUrl>
+#include <QWidget>
+#include "sidemodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -79,7 +84,10 @@ private:
     //记录当前选择网站序号
     int currentListSelect;
     int currentPage;
-    QJsonArray jsonArray;
+    //保存网站列表的list
+    QList<sideModel*>jsonModelList;
+    //保存查询到的结果
+    QList<sideModel*>resultList;
 
     QMenu *rightMenu;  //右键菜单
     QAction *cutAction;  //剪切

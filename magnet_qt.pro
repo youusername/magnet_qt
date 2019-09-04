@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network webview xmlpatterns
+QT       += core gui network webenginewidgets xmlpatterns
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -33,11 +33,13 @@ CONFIG += c++11
 SOURCES += \
         XTTableView.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        sidemodel.cpp
 
 HEADERS += \
         XTTableView.h \
-        mainwindow.h
+        mainwindow.h \
+        sidemodel.h
 
 FORMS += \
         mainwindow.ui

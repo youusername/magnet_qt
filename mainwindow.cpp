@@ -4,6 +4,8 @@
 #include "QStandardItemModel"
 #include <string>
 
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -14,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initTableView();
     initListTableView();
+
 
 }
 void MainWindow::initTableView(){
@@ -110,7 +113,7 @@ void MainWindow::initListTableView(){
      }
 
     QJsonArray array = jsonDoc.array();
-    jsonArray = array;
+
 
     for(int i = 0; i < array.count(); i++)
     {
@@ -118,7 +121,19 @@ void MainWindow::initListTableView(){
         QJsonObject object = array[i].toObject();
         QStandardItem *item = new QStandardItem(object.value("site").toString());
         model->setItem(i,0,item);
+
+        sideModel *jsonmodel = new sideModel();
+        jsonmodel->site = object.value("site").toString();
+        jsonmodel->magnet = object.value("magnet").toString();
+        jsonmodel->group = object.value("group").toString();
+        jsonmodel->name   = object.value("name").toString();
+        jsonmodel->size   = object.value("size").toString();
+        jsonmodel->count  = object.value("count").toString();
+        jsonmodel->source = object.value("source").toString();
+        jsonModelList << jsonmodel;
     }
+//    qDebug()<<"jsonmodel:"<<jsonmodel->magnet;
+//    delete(jsonmodel);
 
     listTableView->setColumnWidth(0,150);
     listTableView->selectRow(0);
@@ -147,7 +162,7 @@ void MainWindow::onShowOrHideColumn(QAction *action)
 void MainWindow::on_searchButton_clicked(){
 
     qDebug() << "currentListSelect:" << currentListSelect;
-    QJsonObject object = jsonArray[currentListSelect].toObject();
+    sideModel* object = jsonModelList[currentListSelect];
 
 //    if(object.isEmpty()){
 //        qDebug() << "源网站对象为空";
@@ -161,7 +176,7 @@ void MainWindow::on_searchButton_clicked(){
 
     ui->searchText->setText("钢铁侠");
 
-    QString string = object.value("source").toString();
+    QString string = object->source;//object.value("source").toString();
 
     QString str_page = string.replace(QRegExp("PPP"), QString::number(currentPage));
 
@@ -172,50 +187,11 @@ void MainWindow::on_searchButton_clicked(){
 
     QString data_str = MainWindow::getHtml(url_str);
 
-//     qDebug() << data_str;
+//     queryHTML(data_str,object.value("group").toString());
+    queryHTML(data_str,"//table[@class='table table-bordered table-striped']/tbody/tr[1]/td/div/h4/a/@href");
 
-     queryHTML(data_str,object.value("group").toString());
-
-//    xmlDoc *d = htmlParseDoc((const xmlChar*)data_str, "utf-8");
-//    qDebug()<< "doc:"<< d;
-
-
-
-//        xmlDocPtr doc = NULL;
-//        xmlXPathObjectPtr xpath_obj = NULL;
-//        xmlNodeSetPtr nodeset = NULL;
-//        xmlChar* xpath_exp = (xmlChar*)"//a";
-//        xmlChar* uri;
-
-//        doc = xmlParseMemory(data_str.toUtf8().constData(),strlen(data_str.toUtf8().constData()));
-
-//        xpath_obj = getXPathObjectPtr(doc, xpath_exp);
-
-//        if(NULL != xpath_obj) {
-//            nodeset = xpath_obj->nodesetval;
-//            int i = 0;
-//            for(i = 0; i < nodeset->nodeNr; i ++) {
-//                uri = xmlGetProp(nodeset->nodeTab[i],(xmlChar*)"href");
-//                printf("link address:%s\n",uri);
-//                xmlFree(uri);
-//            }
-//            xmlXPathFreeObject(xpath_obj);
-//        }
-//        xmlFreeDoc(doc);
-//        xmlCleanupParser();
 }
 
-//static xmlDocPtr getDocPtr(char* docname) {
-//   xmlDocPtr doc = NULL;
-//   xmlKeepBlanksDefault(0);
-
-//   doc = xmlParseFile(docname);
-//   if(NULL == doc) {
-//       fprintf(stderr, "document cannot be parsed!\n");
-//       exit(1);
-//   }
-//   return doc;
-//}
 
 xmlXPathObjectPtr  MainWindow::getXPathObjectPtr(xmlDocPtr doc, xmlChar* xpath_exp) {
    xmlXPathObjectPtr result;
@@ -244,25 +220,38 @@ QStringList MainWindow::queryHTML(const QString &html, const QString &query) {
 
     htmlParserCtxtPtr ctxt = htmlNewParserCtxt();
 
-    htmlDocPtr htmlDoc = htmlCtxtReadMemory(ctxt, html.toUtf8().constData(), strlen(html.toUtf8().constData()), "", "utf-8", 0);
+    htmlDocPtr htmlDoc = htmlCtxtReadMemory(ctxt, html.toUtf8().constData(), strlen(html.toUtf8().constData()), "", NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET | HTML_PARSE_NODEFDTD);
 
 
     xmlXPathContextPtr context = xmlXPathNewContext ( htmlDoc );
 //    xmlXPathRegister
     xmlXPathObjectPtr result = xmlXPathEvalExpression ((xmlChar*)query.toUtf8().constData(), context);
+//    xmlXPathObjectPtr result = xmlXPathEvalExpression ((const xmlChar*)"//a", context);
+    qDebug()<<"result:"<<result->stringval;
     xmlXPathFreeContext (context);
     if (result == NULL) {
         qDebug()<<"Invalid XQuery ?";
     }
     else {
         xmlNodeSetPtr nodeSet = result->nodesetval;
+
         if ( !xmlXPathNodeSetIsEmpty ( nodeSet ) ) {
             for (int i = 0; i < nodeSet->nodeNr; i++ ) {
                 xmlNodePtr  nodePtr;
                 nodePtr = nodeSet->nodeTab[i];
+
+                qDebug()<<"xmlGetProp:"<< QString::fromUtf8((char*)xmlGetProp(nodePtr,(const xmlChar*)"href"));
+
                 QString xml = QString::fromUtf8((char*)nodePtr->children->content);
-//                list.append(decodeXml(xml));
-                qDebug()<<"xml:"<<xml;
+                qDebug()<<"xml.children:"<<xml;
+                QString xml2 = QString::fromUtf8((char*)nodePtr->content);
+                qDebug()<<"xml:"<<xml2;
+//                qDebug()<<"nodePtr:"<<QString::fromUtf8((char*)nodePtr->content);
+//                qDebug()<<"name:"<<QString::fromUtf8((char*)nodePtr->doc->name);
+//                qDebug()<<"last:"<<QString::fromUtf8((char*)nodePtr->doc->last->content);
+//                qDebug()<<"dic:"<<nodePtr->doc->dict;
+
+                qDebug()<<"-------";
             }
         }
 
