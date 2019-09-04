@@ -24,15 +24,9 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <iostream>
-#include <QtXmlPatterns/QXmlQuery>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libxml/HTMLparser.h>
-#include <iconv.h>
-#include <QtXmlPatterns/QtXmlPatterns>
-#include <QWebEngineView>
-#include <QWebEnginePage>
-#include <QWebChannel>
 #include <QtCore/QUrl>
 #include <QWidget>
 #include "sidemodel.h"
@@ -48,7 +42,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QStringList queryHTML(const QString &html, const QString &query);
+
     static QString getHtml(QString url)
     {
         QNetworkAccessManager *manager = new QNetworkAccessManager();
@@ -64,9 +58,6 @@ public:
 
 private slots:
 
-
-    xmlXPathObjectPtr getXPathObjectPtr(xmlDocPtr doc, xmlChar* xpath_exp);
-
     void on_searchButton_clicked();
     void initTableView();
     void initListTableView();
@@ -78,8 +69,19 @@ private slots:
     void onShowOrHideColumn(QAction *action);
 
 
+    QList<sideModel*> queryHTML(const QString &html, sideModel * model);
+    //清除规则中的点
+    QString clearDot(QString str);
+    //清除空格
+    QString clearSpace(QString str);
+    QString clearMagnet(QString str);
+    //刷新结果列表的数据
+    void reloadTableData(QList<sideModel*>list);
+
 private:
     Ui::MainWindow *ui;
+
+
 
     //记录当前选择网站序号
     int currentListSelect;
@@ -90,10 +92,10 @@ private:
     QList<sideModel*>resultList;
 
     QMenu *rightMenu;  //右键菜单
-    QAction *cutAction;  //剪切
+
     QAction *copyAction;  //复制
-    QAction *pasteAction;  //粘贴
-    QAction *deleteAction;  //删除
+    QAction *downloadAction;  //下载
+
 };
 
 #endif // MAINWINDOW_H

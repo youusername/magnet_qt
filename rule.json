@@ -1,16 +1,5 @@
 [
     {
-        "site": "种子搜",
-        "waiting": "0",
-        "group": "//table[@class\u003d\u0027table table-bordered table-striped\u0027]",
-        "magnet": "./tbody/tr[1]/td/div/h4/a/@href",
-        "name": "./tbody/tr[1]/td/div/h4/a",
-        "size": "./tbody/tr/td[2]/strong",
-        "count": "./tbody/tr/td[1]/strong",
-        "source": "https://www.zhongzilou.com/list/XXX/PPP"
-    },
-
-    {
         "site": "MAG磁力站",
         "waiting": "0",
         "group": "//ul[@class\u003d\u0027link-list\u0027]",
@@ -19,6 +8,17 @@
         "size": "./li/span[2]/span[1]",
         "count": "./li/span[2]/span[2]",
         "source": "http://oabt005.com/index/index/k/XXX/p/PPP"
+    },
+
+    {
+        "site": "种子搜",
+        "waiting": "0",
+        "group": "//table[@class\u003d\u0027table table-bordered table-striped\u0027]",
+        "magnet": "./tbody/tr[1]/td/div/h4/a/@href",
+        "name": "./tbody/tr[1]/td/div/h4/a",
+        "size": "./tbody/tr/td[2]/strong",
+        "count": "./tbody/tr/td[1]/strong",
+        "source": "https://www.zhongzilou.com/list/XXX/PPP"
     },
     {
         "site": "磁力王",
