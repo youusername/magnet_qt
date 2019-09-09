@@ -3,7 +3,7 @@
 #include "QTableView"
 #include "QStandardItemModel"
 #include <qdesktopservices.h>
-
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,6 +15,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initTableView();
     initListTableView();
+    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(htmlFinished(QNetworkReply *)));
+
+    QLabel *lbl = new QLabel;
+    lbl->setFrameRect(QRect(100,100,100,100));
+    QMovie *movie = new QMovie("/Users/finn/Downloads/giphy.gif");
+    lbl->setMovie(movie);
+    movie->start();
+    lbl->show();
+    this->layout()->addWidget(lbl);
+
 
 }
 void MainWindow::initTableView(){
@@ -173,11 +183,18 @@ void MainWindow::onShowOrHideColumn(QAction *action)
 //搜索按钮点击事件
 void MainWindow::on_searchButton_clicked(){
 
+    resultList.clear();
+//    ui->tableView->setModel(NULL);
+    if(ui->tableView->model() != NULL){
+        delete(ui->tableView->model());
+        ui->tableView->setModel(NULL);
+    }
 //    qDebug() << "search_row:" << currentListSelect;
     sideModel* object = jsonModelList[currentListSelect];
 
     if(jsonModelList.length()<=0){
         qDebug() << "源网站对象为空";
+
         return;
     }
 
@@ -196,15 +213,75 @@ void MainWindow::on_searchButton_clicked(){
     QByteArray byteArrayPercentEncoded = keyword_utf8.toPercentEncoding();
     QString encode_keyword =  QString(byteArrayPercentEncoded);
     QString url_str = string.replace(QRegExp("XXX"),encode_keyword);
+    qDebug()<<"search URL:"<<url_str;
+    qDebug()<<"-------";
+//    QString data_str = MainWindow::getHtml(url_str);
 
-    QString data_str = MainWindow::getHtml(url_str);
+//    mutex.lock();
+    if(reply != NULL){
 
-    resultList.clear();
-    resultList = queryHTML(data_str,object);
+        reply->deleteLater();
+        qDebug() << "deleteLater reply";
+    }
 
-    reloadTableData(resultList);
+    reply = manager->get(QNetworkRequest(QUrl(url_str)));
+//    QByteArray responseData;
+//    QEventLoop eventLoop;
+//    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),this, SLOT(slotError(QNetworkReply::NetworkError)));
+//    connect(manager, SIGNAL(sslErrors(QList<QSslError>)),this, SLOT(slotSslErrors(QList<QSslError>)));
+//    eventLoop.exec();
+    //block until finish
+//    responseData = reply->readAll();
+
+//    qDebug()<<"html.length:"<< responseData.length();
+
+
+//    if(responseData.length() <= 0){
+//        qDebug() << "html Data 为 空";
+//        if(reply != NULL){
+//            reply->finished();
+//            qDebug() << "html Data 为 空" << "finished reply";
+//        }
+//        mutex.unlock();
+//        return;
+//    }
+
+
+//    resultList = queryHTML(responseData,object);
+//    mutex.unlock();
+
+//    reloadTableData(resultList);
+
 }
 
+void MainWindow::htmlFinished(QNetworkReply *reply){
+
+    sideModel * object = jsonModelList[currentListSelect];
+
+    //取出域名判断是不是最后点击的网站
+    QString reply_url = reply->url().toString().split(QRegExp("://"))[1].split(QRegExp("/"))[0];
+    QString current_url = object->source.split(QRegExp("://"))[1].split(QRegExp("/"))[0];
+
+//    qDebug()<<"reply_url:"<<reply_url;
+//    qDebug()<<"current_url:"<<current_url;
+
+    if(reply_url.compare(current_url) == 0){
+
+        QString responseData = reply->readAll();
+        qDebug()<<"-------";
+//        qDebug()<<"html_URL:"<< reply->url();
+        qDebug()<<"htmlFinished:"<< responseData.length();
+        qDebug()<<"-------";
+        resultList = queryHTML(responseData,object);
+
+        reloadTableData(resultList);
+    }else {
+        qDebug()<<"不是当前选中,路过结果!";
+    }
+
+
+
+}
 
 QList<sideModel*> MainWindow::queryHTML(const QString &html, sideModel * model) {
 
@@ -232,9 +309,6 @@ QList<sideModel*> MainWindow::queryHTML(const QString &html, sideModel * model) 
     xmlXPathObjectPtr result_size = xmlXPathEvalExpression ((const xmlChar*)query_size.toUtf8().constData(), context);
     xmlXPathObjectPtr result_count = xmlXPathEvalExpression ((const xmlChar*)query_count.toUtf8().constData(), context);
 
-
-
-//    qDebug()<<"result:"<<result->stringval;
     xmlXPathFreeContext (context);
 
 
@@ -302,7 +376,7 @@ QList<sideModel*> MainWindow::queryHTML(const QString &html, sideModel * model) 
         xmlXPathFreeObject (result_count);
     }
 
-//    qDebug()<<list;
+    qDebug()<<"xPath结果:"<<list.length();
     return list;
 }
 QString MainWindow::clearMagnet(QString str){
@@ -376,6 +450,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::reloadTableData(QList<sideModel*>list){
+
     QStandardItemModel *model = new QStandardItemModel();
     ui->tableView->setModel(model);//来使用model
 

@@ -42,19 +42,21 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    static QString getHtml(QString url)
-    {
-        QNetworkAccessManager *manager = new QNetworkAccessManager();
-        QNetworkReply *reply = manager->get(QNetworkRequest(QUrl(url)));
-        QByteArray responseData;
-        QEventLoop eventLoop;
-        connect(manager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-        eventLoop.exec();
-//block until finish
-        responseData = reply->readAll();
-        return QString(responseData);
-    }
+    QMutex mutex;
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QNetworkReply *reply;
+//    static QString getHtml(QString url)
+//    {
+//        QNetworkAccessManager *manager = new QNetworkAccessManager();
+//        QNetworkReply *reply = manager->get(QNetworkRequest(QUrl(url)));
+//        QByteArray responseData;
+//        QEventLoop eventLoop;
+//        connect(manager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+//        eventLoop.exec();
+///*block until finish*/
+//        responseData = reply->readAll();
+//        return QString(responseData);
+//    }
 
 private slots:
 
@@ -68,7 +70,7 @@ private slots:
     void clicked_rightMenu(const QPoint &pos);  //右键信号槽函数
     void onShowOrHideColumn(QAction *action);
 
-
+    void htmlFinished(QNetworkReply *reply);
     QList<sideModel*> queryHTML(const QString &html, sideModel * model);
     //清除规则中的点
     QString clearDot(QString str);

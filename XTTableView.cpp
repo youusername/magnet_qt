@@ -24,13 +24,13 @@ void XTTableView::mousePressEvent(QMouseEvent * event)
 
      if (event->button() == Qt::LeftButton)//鼠标左键
      {
-         qDebug() << "leftClicked";
+//         qDebug() << "leftClicked";
 
          emit leftClicked(index);
 
      }else{//鼠标右键
 
-         qDebug() << "rightClicked";
+//         qDebug() << "rightClicked";
          emit rightClicked(index);
      }
 }
