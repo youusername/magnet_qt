@@ -4,6 +4,9 @@
 #include "QStandardItemModel"
 #include <qdesktopservices.h>
 #include <QLabel>
+#include <QPixmap>
+
+static const QString DEFS_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,15 +20,43 @@ MainWindow::MainWindow(QWidget *parent) :
     initListTableView();
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(htmlFinished(QNetworkReply *)));
 
-    QLabel *lbl = new QLabel;
-    lbl->setFrameRect(QRect(100,100,100,100));
-    QMovie *movie = new QMovie("/Users/finn/Downloads/giphy.gif");
-    lbl->setMovie(movie);
-    movie->start();
-    lbl->show();
-    this->layout()->addWidget(lbl);
+
+    m_updater = QSimpleUpdater::getInstance();
 
 
+    /* Get settings from the UI */
+    QString version = "0.1";
+    bool customAppcast = false;
+    bool downloaderEnabled = true;
+    bool notifyOnFinish = false;
+    bool notifyOnUpdate = true;
+    bool mandatoryUpdate = false;
+
+    /* Apply the settings */
+    m_updater->setModuleVersion (DEFS_URL, version);
+    m_updater->setNotifyOnFinish (DEFS_URL, notifyOnFinish);
+    m_updater->setNotifyOnUpdate (DEFS_URL, notifyOnUpdate);
+    m_updater->setUseCustomAppcast (DEFS_URL, customAppcast);
+    m_updater->setDownloaderEnabled (DEFS_URL, downloaderEnabled);
+    m_updater->setMandatoryUpdate (DEFS_URL, mandatoryUpdate);
+
+    /* Check for updates */
+    m_updater->checkForUpdates (DEFS_URL);
+
+    QPixmap pix(":/img/icon512.png");
+    ui->label_pix->setPixmap(pix.scaled(100,100,Qt::KeepAspectRatio));
+
+
+//    QLabel *lbl = new QLabel;
+//    lbl->setFrameRect(QRect(100,100,100,100));
+//    QMovie *movie = new QMovie("/Users/finn/Downloads/giphy.gif");
+//    lbl->setMovie(movie);
+//    movie->start();
+//    lbl->show();
+//    this->layout()->addWidget(lbl);
+
+//    更新json URL
+//    https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json
 }
 void MainWindow::initTableView(){
     XTTableView *tableview = ui->tableView;
@@ -225,32 +256,6 @@ void MainWindow::on_searchButton_clicked(){
     }
 
     reply = manager->get(QNetworkRequest(QUrl(url_str)));
-//    QByteArray responseData;
-//    QEventLoop eventLoop;
-//    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),this, SLOT(slotError(QNetworkReply::NetworkError)));
-//    connect(manager, SIGNAL(sslErrors(QList<QSslError>)),this, SLOT(slotSslErrors(QList<QSslError>)));
-//    eventLoop.exec();
-    //block until finish
-//    responseData = reply->readAll();
-
-//    qDebug()<<"html.length:"<< responseData.length();
-
-
-//    if(responseData.length() <= 0){
-//        qDebug() << "html Data 为 空";
-//        if(reply != NULL){
-//            reply->finished();
-//            qDebug() << "html Data 为 空" << "finished reply";
-//        }
-//        mutex.unlock();
-//        return;
-//    }
-
-
-//    resultList = queryHTML(responseData,object);
-//    mutex.unlock();
-
-//    reloadTableData(resultList);
 
 }
 

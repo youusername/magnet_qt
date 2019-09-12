@@ -30,6 +30,7 @@
 #include <QtCore/QUrl>
 #include <QWidget>
 #include "sidemodel.h"
+#include <QSimpleUpdater.h>
 
 namespace Ui {
 class MainWindow;
@@ -82,7 +83,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
+    QSimpleUpdater* m_updater;
 
 
     //记录当前选择网站序号

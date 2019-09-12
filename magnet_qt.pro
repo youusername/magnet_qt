@@ -50,5 +50,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    icon512.png \
     rule.json
+
+RESOURCES += \
+    resource.qrc
+
+include ($$PWD/QSimpleUpdater/QSimpleUpdater.pri)
