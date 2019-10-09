@@ -2,6 +2,11 @@
 #define SIDEMODEL_H
 
 #include <QObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QJsonValue>
 
 class sideModel : public QObject
 {
@@ -15,9 +20,13 @@ public:
     QString count;
     QString source;
     QString magnet;
+
 signals:
+
 
 public slots:
 };
+
+
 
 #endif // SIDEMODEL_H

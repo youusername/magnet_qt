@@ -4,3 +4,5 @@ sideModel::sideModel(QObject *parent) : QObject(parent)
 {
 
 }
+
+

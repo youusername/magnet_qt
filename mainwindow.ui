@@ -54,6 +54,9 @@
             <height>150</height>
            </size>
           </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -208,7 +211,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
-           <widget class="QCheckBox" name="checkBox_2">
+           <widget class="QCheckBox" name="multipleSelection">
             <property name="minimumSize">
              <size>
               <width>100</width>
@@ -222,7 +225,7 @@
              </size>
             </property>
             <property name="text">
-             <string>CheckBox</string>
+             <string>多选</string>
             </property>
            </widget>
           </item>
@@ -265,9 +268,9 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="copyMultipleSelection">
             <property name="text">
-             <string>PushButton</string>
+             <string>复制多选</string>
             </property>
            </widget>
           </item>

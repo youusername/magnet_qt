@@ -4,19 +4,24 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network webenginewidgets xmlpatterns
+QT       += core gui network xmlpatterns
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = magnet_qt
 TEMPLATE = app
 
-#macx {
+macx {
 LIBS += -L/usr/local/opt/libxml2/lib -lxml2
 INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
 
-#}
-
+}
+win32 {
+LIBS += -LC:\LIB\libxml2\lib -lxml2
+INCLUDEPATH += C:\LIB\libxml2\include\libxml2
+#LIBS += -L$$PWD/LIB/libxml2/lib -lxml2
+#INCLUDEPATH += $$PWD/LIB/libxml2/include/libxml2
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -32,12 +37,14 @@ CONFIG += c++11
 
 SOURCES += \
         XTTableView.cpp \
+        checkboxdelegate.cpp \
         main.cpp \
         mainwindow.cpp \
         sidemodel.cpp
 
 HEADERS += \
         XTTableView.h \
+        checkboxdelegate.h \
         mainwindow.h \
         sidemodel.h
 
@@ -49,8 +56,7 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    rule.json
+DISTFILES +=
 
 RESOURCES += \
     resource.qrc

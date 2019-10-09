@@ -5,8 +5,11 @@
 #include <qdesktopservices.h>
 #include <QLabel>
 #include <QPixmap>
+#include <QMessageBox>
+#include "checkboxdelegate.h"
 
 static const QString DEFS_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json";
+static const QString RULE_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/rule.json";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,57 +24,32 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(htmlFinished(QNetworkReply *)));
 
 
-    m_updater = QSimpleUpdater::getInstance();
-
-
-    /* Get settings from the UI */
-    QString version = "0.1";
-    bool customAppcast = false;
-    bool downloaderEnabled = true;
-    bool notifyOnFinish = false;
-    bool notifyOnUpdate = true;
-    bool mandatoryUpdate = false;
-
-    /* Apply the settings */
-    m_updater->setModuleVersion (DEFS_URL, version);
-    m_updater->setNotifyOnFinish (DEFS_URL, notifyOnFinish);
-    m_updater->setNotifyOnUpdate (DEFS_URL, notifyOnUpdate);
-    m_updater->setUseCustomAppcast (DEFS_URL, customAppcast);
-    m_updater->setDownloaderEnabled (DEFS_URL, downloaderEnabled);
-    m_updater->setMandatoryUpdate (DEFS_URL, mandatoryUpdate);
-
-    /* Check for updates */
-    m_updater->checkForUpdates (DEFS_URL);
+    autoUpdate();
 
     QPixmap pix(":/img/icon512.png");
+
     ui->label_pix->setPixmap(pix.scaled(100,100,Qt::KeepAspectRatio));
 
+    this->setWindowTitle("磁力助手");
+    this->setWindowIcon(QIcon(":/img/icon512.png"));
 
-//    QLabel *lbl = new QLabel;
-//    lbl->setFrameRect(QRect(100,100,100,100));
-//    QMovie *movie = new QMovie("/Users/finn/Downloads/giphy.gif");
-//    lbl->setMovie(movie);
-//    movie->start();
-//    lbl->show();
-//    this->layout()->addWidget(lbl);
+    ui->searchText->setText("钢铁侠");
+    on_searchButton_clicked();
 
-//    更新json URL
-//    https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json
 }
 void MainWindow::initTableView(){
     XTTableView *tableview = ui->tableView;
     tableview->setSelectionBehavior(QAbstractItemView::SelectRows);
-    tableview->setSelectionMode(QAbstractItemView::SingleSelection);
+    tableview->setSelectionMode(QAbstractItemView::ExtendedSelection);
     tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tableview->setAlternatingRowColors(true);
-
 
     connect(tableview,SIGNAL(leftClicked(const QModelIndex &)),this,SLOT(testSlot()));
 
     QStandardItemModel *model = new QStandardItemModel();
     tableview->setModel(model);//来使用model
 //    model->setHeaderData(0,Qt::Horizontal,"ID");//设置表的column名称；
-    model->setColumnCount(4);    //列
+    model->setColumnCount(5);    //列
 
     //添加数据
     for(int j=0;j<15;j++)
@@ -82,6 +60,9 @@ void MainWindow::initTableView(){
 
         QStandardItem *item2 = new QStandardItem("22222"+QString::number(j));
         model->setItem(j,1,item2);
+
+        QStandardItem *item3 = new QStandardItem("xxxxx"+QString::number(j));
+        model->setItem(j,2,item3);
 
         QPushButton * m_button = new QPushButton("打开");
 
@@ -94,12 +75,12 @@ void MainWindow::initTableView(){
        ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,3),m_button);
 
     }
-    tableview->setColumnWidth(0,500);
-    tableview->setColumnWidth(1,80);
-    tableview->setColumnWidth(2,80);
-    tableview->setColumnWidth(3,80);
-    tableview->showMaximized();
 
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);//对第0列单独设置固定宽度
+    ui->tableView->setColumnWidth(1,80);
+    ui->tableView->setColumnWidth(2,80);
+    ui->tableView->setColumnWidth(3,80);
     tableview->setContextMenuPolicy(Qt::CustomContextMenu);  //少这句，右键没有任何反应的。
 
     rightMenu = new QMenu;
@@ -127,16 +108,29 @@ void MainWindow::initListTableView(){
     QStandardItemModel *model = new QStandardItemModel();
     listTableView->setModel(model);//来使用model
     model->setColumnCount(1);    //列
+/*
+    QString filePath = QDir::currentPath() + "/rule.json";
+#if defined(Q_OS_WIN32)
+    //https://blog.csdn.net/x356982611/article/details/67099589
+    qDebug()<<"Q_OS_WIN32";
+#else
+    qDebug()<<"Q_OS_MACOS";
+//    filePath = QApplication::applicationDirPath() + "/rule.json";
+    filePath = "/Users/finn/build-magnet_qt-Desktop_Qt_5_13_0_clang_64bit-Debug/magnet_qt.app/Contents/MacOS/rule.json";
+#endif
 
-    QFile file(QDir::homePath() + "/magnet_qt/rule.json");
-        if(!file.open(QIODevice::ReadWrite)) {
+    QFile file(filePath);
+    qDebug() <<"FilePath:"<<filePath;
+        if(!file.open(QIODevice::ReadOnly)) {
             qDebug() << "File open error";
         } else {
             qDebug() <<"File open!";
         }
+*/
 
-    QByteArray allData = file.readAll();
-    file.close();
+
+    QByteArray allData = getHtml(RULE_URL);
+//    file.close();
 
 
     QJsonParseError json_error;
@@ -144,7 +138,8 @@ void MainWindow::initListTableView(){
 
     if(jsonDoc.isNull() || (json_error.error != QJsonParseError::NoError))
     {
-            qDebug() << "json error!";
+            qDebug() << "json error:"<<json_error.errorString();
+            QMessageBox::critical(NULL, "错误", "1.请尝试重新打开\n2.更新到最新版本\n3.联系开发者");
             return;
      }
 
@@ -175,6 +170,31 @@ void MainWindow::initListTableView(){
     listTableView->selectRow(0);
     currentListSelect = 0;
 
+}
+
+void MainWindow::autoUpdate()
+{
+    m_updater = QSimpleUpdater::getInstance();
+
+
+    /* Get settings from the UI */
+    QString version = "0.1";
+    bool customAppcast = false;
+    bool downloaderEnabled = true;
+    bool notifyOnFinish = false;
+    bool notifyOnUpdate = true;
+    bool mandatoryUpdate = false;
+
+    /* Apply the settings */
+    m_updater->setModuleVersion (DEFS_URL, version);
+    m_updater->setNotifyOnFinish (DEFS_URL, notifyOnFinish);
+    m_updater->setNotifyOnUpdate (DEFS_URL, notifyOnUpdate);
+    m_updater->setUseCustomAppcast (DEFS_URL, customAppcast);
+    m_updater->setDownloaderEnabled (DEFS_URL, downloaderEnabled);
+    m_updater->setMandatoryUpdate (DEFS_URL, mandatoryUpdate);
+
+    /* Check for updates */
+    m_updater->checkForUpdates (DEFS_URL);
 }
 //源网站列表点击
 void MainWindow::clickListTableView(){
@@ -229,12 +249,12 @@ void MainWindow::on_searchButton_clicked(){
         return;
     }
 
-//    if(ui->searchText->text().isEmpty()){
-//        qDebug() << "搜索关键字为空";
-//        return;
-//    }
+    if(ui->searchText->text().isEmpty()){
+        qDebug() << "搜索关键字为空";
+        return;
+    }
 
-    ui->searchText->setText("钢铁侠");
+//    ui->searchText->setText("钢铁侠");
 
     QString string = object->source;//object.value("source").toString();
 
@@ -245,14 +265,12 @@ void MainWindow::on_searchButton_clicked(){
     QString encode_keyword =  QString(byteArrayPercentEncoded);
     QString url_str = string.replace(QRegExp("XXX"),encode_keyword);
     qDebug()<<"search URL:"<<url_str;
-    qDebug()<<"-------";
-//    QString data_str = MainWindow::getHtml(url_str);
+//    qDebug()<<"-------";
 
-//    mutex.lock();
     if(reply != NULL){
 
         reply->deleteLater();
-        qDebug() << "deleteLater reply";
+//        qDebug() << "deleteLater reply";
     }
 
     reply = manager->get(QNetworkRequest(QUrl(url_str)));
@@ -459,39 +477,81 @@ void MainWindow::reloadTableData(QList<sideModel*>list){
     QStandardItemModel *model = new QStandardItemModel();
     ui->tableView->setModel(model);//来使用model
 
-//    model->setHeaderData(0,Qt::Horizontal,"ID");//设置表的column名称；
-    model->setColumnCount(4);    //列
+    if(ui->multipleSelection->checkState() == Qt::Checked){
 
-    //添加数据
-    for(int j=0;j<list.length();j++)
-    {
-        sideModel * side = list[j];
-         //写id
-        QStandardItem *item_magnet = new QStandardItem(side->name);//QString::number(j)));
-        model->setItem(j,0,item_magnet);
+        model->setColumnCount(5);    //列
+        //添加数据
+        for(int j=0;j<list.length();j++)
+        {
+            sideModel * side = list[j];
+             //写id
+            QStandardItem *item_magnet = new QStandardItem(side->name);//QString::number(j)));
+            model->setItem(j,1,item_magnet);
 
-        QStandardItem *item_size = new QStandardItem(side->site);
-        model->setItem(j,1,item_size);
+            QStandardItem *item_size = new QStandardItem(side->site);
+            model->setItem(j,2,item_size);
 
-        QStandardItem *item_count = new QStandardItem(side->count);
-        model->setItem(j,2,item_count);
+            QStandardItem *item_count = new QStandardItem(side->count);
+            model->setItem(j,3,item_count);
 
-        QPushButton * m_button = new QPushButton("网盘打开");
+            QPushButton * m_button = new QPushButton("网盘打开");
 
-                        //触发下载按钮的槽函数
-        connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
-        m_button->setProperty("row", j);  //为按钮设置row属性
-        m_button->setProperty("fileName", QString::number(j));  //为按钮设置fileName属性
-        //m_button->setProperty("column", col)
+                            //触发下载按钮的槽函数
+            connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
+            m_button->setProperty("row", j);  //为按钮设置row属性
+            m_button->setProperty("fileName", QString::number(j));  //为按钮设置fileName属性
+            //m_button->setProperty("column", col)
 
-       ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,3),m_button);
+           ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,4),m_button);
 
+        }
+
+        ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+        ui->tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);//对第0列单独设置固定宽度
+        ui->tableView->setColumnWidth(0,40);
+        ui->tableView->setColumnWidth(2,80);
+        ui->tableView->setColumnWidth(3,80);
+        ui->tableView->setColumnWidth(4,80);
+
+        CheckBoxDelegate *ck = new CheckBoxDelegate(/*&tb*/);
+        ui->tableView->setItemDelegate(ck);
+    }else{
+        model->setColumnCount(4);    //列
+        //添加数据
+        for(int j=0;j<list.length();j++)
+        {
+            sideModel * side = list[j];
+             //写id
+            QStandardItem *item_magnet = new QStandardItem(side->name);//QString::number(j)));
+            model->setItem(j,0,item_magnet);
+
+            QStandardItem *item_size = new QStandardItem(side->site);
+            model->setItem(j,1,item_size);
+
+            QStandardItem *item_count = new QStandardItem(side->count);
+            model->setItem(j,2,item_count);
+
+            QPushButton * m_button = new QPushButton("网盘打开");
+
+                            //触发下载按钮的槽函数
+            connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
+            m_button->setProperty("row", j);  //为按钮设置row属性
+            m_button->setProperty("fileName", QString::number(j));  //为按钮设置fileName属性
+            //m_button->setProperty("column", col)
+
+           ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,3),m_button);
+
+        }
+
+        ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+        ui->tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);//对第0列单独设置固定宽度
+        ui->tableView->setColumnWidth(1,80);
+        ui->tableView->setColumnWidth(2,80);
+        ui->tableView->setColumnWidth(3,80);
+
+        QStyledItemDelegate *ck = new QStyledItemDelegate();
+        ui->tableView->setItemDelegate(ck);
     }
-    ui->tableView->setColumnWidth(0,350);
-    ui->tableView->setColumnWidth(1,80);
-    ui->tableView->setColumnWidth(2,50);
-    ui->tableView->setColumnWidth(3,80);
-    ui->tableView->showMaximized();
 }
 
 void MainWindow::testSlot(){
@@ -525,9 +585,35 @@ void MainWindow::clickDownloadButton(){
 }
 
 
+void MainWindow::on_multipleSelection_clicked()
+{
+    reloadTableData(resultList);
+}
+
+void MainWindow::on_copyMultipleSelection_clicked()
+{
+    if(ui->multipleSelection->checkState() != Qt::Checked){
+        return;
+    }
+    QString multipleStr;
+    QAbstractItemModel *model = ui->tableView->model ();
+    for (int i =0;i<resultList.count();i++) {
+        QModelIndex index = model->index(i,0);
+        bool checked = model->data(index, Qt::DisplayRole).toBool();
+//        QVariant data = model->data(index);
+//        qDebug()<<"stat:"<<checked<<"data:"<<data;
+        if(checked){
+            sideModel * smodel = resultList[i];
+            multipleStr.append(smodel->magnet + "\r\n");
+        }
+     }
+    qDebug()<<multipleStr;
+
+    if(!multipleStr.isEmpty()){
+        QClipboard *clipboard = QApplication::clipboard();  //获取系统剪贴板指针
+        QString originalText = clipboard->text();           //获取剪贴板上文本信息
+        clipboard->setText(multipleStr);                  //设置剪贴板内容
+    }
 
 
-
-
-
-
+}

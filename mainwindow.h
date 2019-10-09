@@ -46,18 +46,19 @@ public:
     QMutex mutex;
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     QNetworkReply *reply;
-//    static QString getHtml(QString url)
-//    {
-//        QNetworkAccessManager *manager = new QNetworkAccessManager();
-//        QNetworkReply *reply = manager->get(QNetworkRequest(QUrl(url)));
-//        QByteArray responseData;
-//        QEventLoop eventLoop;
-//        connect(manager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-//        eventLoop.exec();
-///*block until finish*/
-//        responseData = reply->readAll();
-//        return QString(responseData);
-//    }
+
+    static QByteArray getHtml(QString url)
+    {
+        QNetworkAccessManager *manager = new QNetworkAccessManager();
+        QNetworkReply *reply = manager->get(QNetworkRequest(QUrl(url)));
+        QByteArray responseData;
+        QEventLoop eventLoop;
+        connect(manager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+        eventLoop.exec();
+/*block until finish*/
+        responseData = reply->readAll();
+        return responseData;
+    }
 
 private slots:
 
@@ -65,6 +66,7 @@ private slots:
     void initTableView();
     void initListTableView();
 
+    void autoUpdate();
     void clickListTableView();
     void clickDownloadButton();
     void testSlot();
@@ -80,6 +82,10 @@ private slots:
     QString clearMagnet(QString str);
     //刷新结果列表的数据
     void reloadTableData(QList<sideModel*>list);
+
+    void on_multipleSelection_clicked();
+
+    void on_copyMultipleSelection_clicked();
 
 private:
     Ui::MainWindow *ui;
