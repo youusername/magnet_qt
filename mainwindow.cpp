@@ -10,7 +10,7 @@
 #include <QClipboard>
 
 static const QString DEFS_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json";
-static const QString RULE_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/rule.json";
+static const QString RULE_URL = "https://bt.lansou.pw/mac/rule";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -78,7 +78,8 @@ void MainWindow::initTableView(){
     }
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);//对第0列单独设置固定宽度
+    ui->tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);//对第0列单独设置固定宽度
+    ui->tableView->setColumnWidth(0,40);
     ui->tableView->setColumnWidth(1,80);
     ui->tableView->setColumnWidth(2,80);
     ui->tableView->setColumnWidth(3,80);
@@ -268,11 +269,10 @@ void MainWindow::on_searchButton_clicked(){
     qDebug()<<"search URL:"<<url_str;
 //    qDebug()<<"-------";
 
-    if(reply != NULL){
-
-        reply->deleteLater();
+//    if(reply != NULL){
+//        reply->deleteLater();
 //        qDebug() << "deleteLater reply";
-    }
+//    }
 
     reply = manager->get(QNetworkRequest(QUrl(url_str)));
 
@@ -283,15 +283,17 @@ void MainWindow::htmlFinished(QNetworkReply *reply){
     sideModel * object = jsonModelList[currentListSelect];
 
     //取出域名判断是不是最后点击的网站
-    QString reply_url = reply->url().toString().split(QRegExp("://"))[1].split(QRegExp("/"))[0];
-    QString current_url = object->source.split(QRegExp("://"))[1].split(QRegExp("/"))[0];
+//    QString reply_str = reply->url().toString().split(QRegExp("://"))[1];
+//    QString current_str = object->source.split(QRegExp("://"))[1];
 
-//    qDebug()<<"reply_url:"<<reply_url;
-//    qDebug()<<"current_url:"<<current_url;
-
-    if(reply_url.compare(current_url) == 0){
+//    if(reply_url.compare(current_url) == 0){
+//        qDebug()<<"reply_url:"<<reply_url;
+//        qDebug()<<"current_url:"<<current_url;
+        qDebug()<<" ";
 
         QString responseData = reply->readAll();
+
+        reply->deleteLater();
         qDebug()<<"-------";
 //        qDebug()<<"html_URL:"<< reply->url();
         qDebug()<<"htmlFinished:"<< responseData.length();
@@ -299,9 +301,11 @@ void MainWindow::htmlFinished(QNetworkReply *reply){
         resultList = queryHTML(responseData,object);
 
         reloadTableData(resultList);
-    }else {
-        qDebug()<<"不是当前选中,路过结果!";
-    }
+//    }else {
+//        qDebug()<<"reply_url:"<<reply_url;
+//        qDebug()<<"current_url:"<<current_url;
+//        qDebug()<<"不是当前选中,路过结果!";
+//    }
 
 
 
@@ -356,10 +360,12 @@ QList<sideModel*> MainWindow::queryHTML(const QString &html, sideModel * model) 
 
                 QString magnet = QString::fromUtf8((char*)nodePtr_magnet->children->content);
                 QString size = QString::fromUtf8((char*)nodePtr_size->children->content);
-                QString count = QString::fromUtf8((char*)nodePtr_count->children->content);
-
+                QString count = "";
+                if (nodePtr_count->children != nullptr){
+                count = QString::fromUtf8((char*)nodePtr_count->children->content);
+                }
                 QString name = "";
-                if(!QString::fromUtf8((char*)nodePtr_name->children->content).isEmpty()){
+                if(nodePtr_name->children->content != nullptr){
                     name = name + QString::fromUtf8((char*)nodePtr_name->children->content);
                 }
 
@@ -383,11 +389,11 @@ QList<sideModel*> MainWindow::queryHTML(const QString &html, sideModel * model) 
                 result_model->site      = size;
                 result_model->count     = count;
 
-//                qDebug()<<"magnet:"<<magnet;
-//                qDebug()<<"name:"<<name;
-//                qDebug()<<"size:"<<size;
-//                qDebug()<<"count:"<<count;
-//                qDebug()<<"-------";
+                qDebug()<<"magnet:"<<magnet;
+                qDebug()<<"name:"<<name;
+                qDebug()<<"size:"<<size;
+                qDebug()<<"count:"<<count;
+                qDebug()<<"-------";
 
                 list << result_model;
 
@@ -452,7 +458,8 @@ QString MainWindow::clearSpace(QString str){
     QString clearStr ;
 
     clearStr = str.replace(" ","");
-
+    clearStr = str.replace("\t","");
+    clearStr = str.replace("\n","");
 //    qDebug()<< str << ":----:" << clearStr;
     return clearStr;
 }
@@ -495,7 +502,7 @@ void MainWindow::reloadTableData(QList<sideModel*>list){
             QStandardItem *item_count = new QStandardItem(side->count);
             model->setItem(j,3,item_count);
 
-            QPushButton * m_button = new QPushButton("网盘打开");
+            QPushButton * m_button = new QPushButton("Copy");
 
                             //触发下载按钮的槽函数
             connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
@@ -532,7 +539,7 @@ void MainWindow::reloadTableData(QList<sideModel*>list){
             QStandardItem *item_count = new QStandardItem(side->count);
             model->setItem(j,2,item_count);
 
-            QPushButton * m_button = new QPushButton("网盘打开");
+            QPushButton * m_button = new QPushButton("Copy");
 
                             //触发下载按钮的槽函数
             connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
@@ -579,9 +586,12 @@ void MainWindow::clickDownloadButton(){
 //    qDebug() << "click_magnet:" << model->magnet;
 //    qDebug() << "button_row:"<<row << "row:" << ui->tableView->currentIndex().row() << "column:" << ui->tableView->currentIndex().column();
 
-    QString URL = "https://pan.bitqiu.com/promote-invite?mafrom=promote&mipos=cps&uid=110290000&agentdown=" + obj_model->magnet;
-    qDebug() << "url:" << URL;
-    QDesktopServices::openUrl(QUrl(URL));
+//    QString URL = "https://pan.bitqiu.com/promote-invite?mafrom=promote&mipos=cps&uid=110290000&agentdown=" + obj_model->magnet;
+//    qDebug() << "url:" << URL;
+//    QDesktopServices::openUrl(QUrl(URL));
+    QClipboard *clipboard = QApplication::clipboard();  //获取系统剪贴板指针
+    QString originalText = clipboard->text();           //获取剪贴板上文本信息
+    clipboard->setText(obj_model->magnet);                  //设置剪贴板内容
 
 }
 
