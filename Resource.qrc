@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>img/icon512.png</file>
+        <file>img/icon-sina-weibo.png</file>
+        <file>img/donateImage.png</file>
     </qresource>
 </RCC>

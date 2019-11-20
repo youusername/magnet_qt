@@ -10,18 +10,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = magnet_qt
 TEMPLATE = app
-
 macx {
-LIBS += -L/usr/local/opt/libxml2/lib -lxml2
-INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
+    LIBS += -L/usr/local/opt/libxml2/lib -lxml2
+    INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
 
+}else{
+    LIBS += -LC:/msys64/mingw64/lib -lssl -lxml2
+    INCLUDEPATH += C:/msys64/mingw64/include/libxml2
 }
-win32 {
-LIBS += -LC:\LIB\libxml2\lib -lxml2
-INCLUDEPATH += C:\LIB\libxml2\include\libxml2
-#LIBS += -L$$PWD/LIB/libxml2/lib -lxml2
-#INCLUDEPATH += $$PWD/LIB/libxml2/include/libxml2
-}
+
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings

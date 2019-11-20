@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QMessageBox>
 #include "checkboxdelegate.h"
+#include <QClipboard>
 
 static const QString DEFS_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json";
 static const QString RULE_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/rule.json";
@@ -615,5 +616,19 @@ void MainWindow::on_copyMultipleSelection_clicked()
         clipboard->setText(multipleStr);                  //设置剪贴板内容
     }
 
+
+}
+
+void MainWindow::on_sina_clicked()
+{
+    QString URL = "https://weibo.com/u/2689574923";
+    QDesktopServices::openUrl(QUrl(URL));
+}
+
+void MainWindow::on_donate_clicked()
+{
+    QMessageBox message(QMessageBox::NoIcon, "冰可乐真好喝"," ");
+    message.setIconPixmap(QPixmap(":/img/donateImage.png").scaled(400,400,Qt::KeepAspectRatio));
+    message.exec();
 
 }

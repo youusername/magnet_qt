@@ -18,7 +18,6 @@
 #include <QDir>
 #include <QUrl>
 #include <QApplication>
-#include <QtWebView/QtWebView>
 #include <QtCore>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -58,6 +57,7 @@ public:
 /*block until finish*/
         responseData = reply->readAll();
         return responseData;
+
     }
 
 private slots:
@@ -86,6 +86,10 @@ private slots:
     void on_multipleSelection_clicked();
 
     void on_copyMultipleSelection_clicked();
+
+    void on_sina_clicked();
+
+    void on_donate_clicked();
 
 private:
     Ui::MainWindow *ui;
