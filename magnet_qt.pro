@@ -13,8 +13,14 @@ TEMPLATE = app
 macx {
     LIBS += -L/usr/local/opt/libxml2/lib -lxml2
     INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
+}
 
-}else{
+unix:!macx {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += libxml-2.0
+}
+
+win32 {
     LIBS += -LC:/msys64/mingw64/lib -lssl -lxml2
     INCLUDEPATH += C:/msys64/mingw64/include/libxml2
 }
