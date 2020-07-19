@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>img/icon512.png</file>
+        <file alias="rule">rule.json</file>
     </qresource>
 </RCC>

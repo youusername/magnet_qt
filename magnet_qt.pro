@@ -4,19 +4,29 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network webenginewidgets xmlpatterns
+QT       += core gui network xmlpatterns
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = magnet_qt
 TEMPLATE = app
 
-#macx {
+
+macx {
+# mac only
 LIBS += -L/usr/local/opt/libxml2/lib -lxml2
 INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
+}
+unix:!macx{
+# linux only
+}
+win32 {
+# windows only
+LIBS += -LC:\msys64\mingw64\lib -lxml2
+INCLUDEPATH += -LC:\msys64\mingw64\include\libxml2 -LC:\msys64\mingw64\include
 
-#}
 
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -49,10 +59,14 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    rule.json
+DISTFILES +=
 
 RESOURCES += \
     resource.qrc
 
-include ($$PWD/QSimpleUpdater/QSimpleUpdater.pri)
+
+#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../opt/libxml2/lib/ -lxml2
+#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../opt/libxml2/lib/ -lxml2d
+
+#INCLUDEPATH += $$PWD/opt/libxml2/include
+#DEPENDPATH += $$PWD/opt/libxml2/include

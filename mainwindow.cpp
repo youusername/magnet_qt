@@ -5,8 +5,9 @@
 #include <qdesktopservices.h>
 #include <QLabel>
 #include <QPixmap>
+#include <QClipboard>
 
-static const QString DEFS_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json";
+static const QString RULE_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/rule.json";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,27 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(htmlFinished(QNetworkReply *)));
 
 
-    m_updater = QSimpleUpdater::getInstance();
 
-
-    /* Get settings from the UI */
-    QString version = "0.1";
-    bool customAppcast = false;
-    bool downloaderEnabled = true;
-    bool notifyOnFinish = false;
-    bool notifyOnUpdate = true;
-    bool mandatoryUpdate = false;
-
-    /* Apply the settings */
-    m_updater->setModuleVersion (DEFS_URL, version);
-    m_updater->setNotifyOnFinish (DEFS_URL, notifyOnFinish);
-    m_updater->setNotifyOnUpdate (DEFS_URL, notifyOnUpdate);
-    m_updater->setUseCustomAppcast (DEFS_URL, customAppcast);
-    m_updater->setDownloaderEnabled (DEFS_URL, downloaderEnabled);
-    m_updater->setMandatoryUpdate (DEFS_URL, mandatoryUpdate);
-
-    /* Check for updates */
-    m_updater->checkForUpdates (DEFS_URL);
 
     QPixmap pix(":/img/icon512.png");
     ui->label_pix->setPixmap(pix.scaled(100,100,Qt::KeepAspectRatio));
@@ -128,23 +109,32 @@ void MainWindow::initListTableView(){
     listTableView->setModel(model);//来使用model
     model->setColumnCount(1);    //列
 
-    QFile file(QDir::homePath() + "/magnet_qt/rule.json");
-        if(!file.open(QIODevice::ReadWrite)) {
-            qDebug() << "File open error";
-        } else {
-            qDebug() <<"File open!";
+    QFileInfo file("rule.json");
+    if(!file.isFile()){
+        qDebug() <<"no File!";
+        if(QFile::copy(":/rule","rule.json")){
+            qDebug() <<"copy File!";
         }
+    }
+    qDebug() <<"File path:"<<file.absoluteFilePath();
+    QFile openFile(file.absoluteFilePath());
 
-    QByteArray allData = file.readAll();
-    file.close();
+    if(!openFile.open(QIODevice::ReadOnly)) {
+        qDebug() << "File open error";
+    } else {
+        qDebug() <<"File open!";
+    }
+
+    QString allData = openFile.readAll();
+    openFile.close();
 
 
     QJsonParseError json_error;
-    QJsonDocument jsonDoc(QJsonDocument::fromJson(allData, &json_error));
-
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(allData.toUtf8(), &json_error);
+    qDebug() << "json:"<<jsonDoc;
     if(jsonDoc.isNull() || (json_error.error != QJsonParseError::NoError))
     {
-            qDebug() << "json error!";
+            qDebug() << "json error!"<<json_error.errorString();
             return;
      }
 
@@ -203,6 +193,7 @@ void MainWindow::onShowOrHideColumn(QAction *action)
 
         QClipboard *clipboard = QApplication::clipboard();  //获取系统剪贴板指针
         QString originalText = clipboard->text();           //获取剪贴板上文本信息
+
         clipboard->setText(model->magnet);                  //设置剪贴板内容
 
     }else {

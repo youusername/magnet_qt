@@ -18,19 +18,32 @@
 #include <QDir>
 #include <QUrl>
 #include <QApplication>
-#include <QtWebView/QtWebView>
 #include <QtCore>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <iostream>
+#include <windows.h>
+
+//#ifdef Q_OS_WIN32
+
+//#include <libxml2/libxml/parser.h>
+//#include <libxml2/libxml/xpath.h>
+//#include <libxml2/libxml/HTMLparser.h>
+
+//#elif
+
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libxml/HTMLparser.h>
+
+//#endif
+
+
 #include <QtCore/QUrl>
 #include <QWidget>
 #include "sidemodel.h"
-#include <QSimpleUpdater.h>
+
 
 namespace Ui {
 class MainWindow;
@@ -83,7 +96,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QSimpleUpdater* m_updater;
+
 
 
     //记录当前选择网站序号
