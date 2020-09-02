@@ -1,14 +1,4 @@
 [
-
-    {
-         "site": "monova",
-         "group": "//tr[@class='desktop ']",
-         "magnet": ".//td[1]/a/@href",
-         "name": ".//td[1]/a",
-         "size": ".//td[2]",
-         "count": ".//td[1]",
-         "source": "https://monova.org/search?term=XXX&cat=&sort=1&verified=0&page=PPP"
-     },
     {
         "site": "btdad",
         "group": "//div[@class='ssbox']",
@@ -16,25 +6,7 @@
         "name": ".//div[1]/h3/a",
         "size": ".//div[2]/span[3]/b",
         "count": ".//div[2]/span[4]",
-        "source": "http://www.btdad.best/search-XXX-0-0-PPP.html"
-    },
-    {
-        "site": "crsososo",
-        "group": "//article[@class='item']",
-        "magnet": ".//div/a/@href",
-        "name": ".//div/a/h4",
-        "size": ".//div/p[1]",
-        "count": ".//div/p[1]",
-        "source": "https://www.crsososo.xyz/search/XXX/page-PPP.html"
-    },
-    {
-        "site": "biliworld",
-        "group": "//div[@class='mnr-c']",
-        "magnet": ".//div/div/div/div[1]/div[2]/cite/a[3]",
-        "name": ".//div/div/div/div[1]/div[1]/h3/a",
-        "size": ".//div/div/div/div[2]/div/span",
-        "count": ".//div/div/div/div[2]/div/span",
-        "source": "https://biliworld.xyz/s/0/XXX/0/3/PPP/"
+        "source": "http://www.btdad.life/search-XXX-0-0-PPP.html"
     },
     {
         "site": "mag234",
@@ -52,7 +24,7 @@
         "name": ".//div[1]/h3/a",
         "size": ".//div[3]/span[3]/b",
         "count": ".//div[3]/span[2]/b",
-        "source": "http://cilibao.biz/s/XXX_rel_PPP.html"
+        "source": "http://cilibao8.org/s/XXX_rel_PPP.html"
     },
     {
         "site": "36dm",
@@ -64,40 +36,12 @@
         "source": "https://www.36dm.club/search.php?keyword=XXX&page=PPP"
     },
     {
-        "site": "bthub",
-        "group": "//div[@class='search-item detail-width']",
-        "magnet": ".//div[1]/h3/a/@href",
-        "name": ".//div[1]/h3/a",
-        "size": ".//div[3]/span[1]/b",
-        "count": ".//div[3]/span[2]/b",
-        "source": "https://bthub.site/cn/search/kw-XXX-PPP.html"
-    },
-    {
       "site": " Btdad.info",
       "group": "//div[@class='ssbox']",
       "magnet": "./div[2]/span[1]/a[1]/@href",
       "name": "./div[1]/h3[1]/a[1]",
       "size": "./div[2]/span[3]/b[1]",
       "count": "./div[2]/span[4]/b[1]",
-      "source": "http://www.btdad.info/search-XXX-0-0-PPP.html"
-    },
-    {
-      "site": "MAG磁力站",
-      "group": "//ul[@class='link-list']",
-      "magnet": "./li/@data-magnet",
-      "name": "./li/span[1]",
-      "size": "./li/span[2]/span[1]",
-      "count": "./li/span[2]/span[2]",
-      "source": "http://f.cili001.com/index/index/k/XXX/p/PPP"
-    },
-    {
-         "site": "octopgo",
-         "group": "//div[@class='listitem']",
-         "magnet": ".//h2/a/@href",
-         "name": ".//h2/a",
-         "size": ".//div[2]/em[3]",
-         "count": ".//div[2]/em[2]",
-         "source": "https://bt.octopgo.com/s/XXX/p/PPP.html"
-     }
+      "source": "http://www.btdad.life/search-XXX-0-0-PPP.html"
+    }
 ]
-

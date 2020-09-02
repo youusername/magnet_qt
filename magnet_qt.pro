@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui network xmlpatterns
+QT += webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -41,13 +42,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        ProgressCircle.cpp \
         XTTableView.cpp \
+        httpclient.cpp \
         main.cpp \
         mainwindow.cpp \
         sidemodel.cpp
 
 HEADERS += \
+        ProgressCircle.h \
         XTTableView.h \
+        httpclient.h \
         mainwindow.h \
         sidemodel.h
 

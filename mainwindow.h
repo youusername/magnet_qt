@@ -23,15 +23,14 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <iostream>
+#include <QWebEngineView>
+#include <QWebEngineScript>
+
+
+#ifdef Q_OS_WIN32
+
 #include <windows.h>
-
-//#ifdef Q_OS_WIN32
-
-//#include <libxml2/libxml/parser.h>
-//#include <libxml2/libxml/xpath.h>
-//#include <libxml2/libxml/HTMLparser.h>
-
-//#elif
+#endif
 
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
@@ -43,6 +42,7 @@
 #include <QtCore/QUrl>
 #include <QWidget>
 #include "sidemodel.h"
+#include "ProgressCircle.h"
 
 
 namespace Ui {
@@ -57,20 +57,11 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QMutex mutex;
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    QNetworkReply *reply;
-//    static QString getHtml(QString url)
-//    {
-//        QNetworkAccessManager *manager = new QNetworkAccessManager();
-//        QNetworkReply *reply = manager->get(QNetworkRequest(QUrl(url)));
-//        QByteArray responseData;
-//        QEventLoop eventLoop;
-//        connect(manager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-//        eventLoop.exec();
-///*block until finish*/
-//        responseData = reply->readAll();
-//        return QString(responseData);
-//    }
+//    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+//    QNetworkReply *reply;
+    QWebEngineView* webView= new  QWebEngineView();
+    ProgressCircle *progressCircle;
+
 
 private slots:
 

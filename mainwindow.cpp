@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QClipboard>
+#include "httpclient.h"
 
 static const QString RULE_URL = "https://gitee.com/zvj88888888/magnet_qt/raw/master/rule.json";
 
@@ -13,31 +14,56 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
+
+
+
+    progressCircle = new ProgressCircle();
+
+    progressCircle->setFixedSize(30, 30);
+    progressCircle->setMaximumHeight(30);
+    progressCircle->setHidden(true);
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->setAlignment(Qt::AlignCenter);
+    layout->addWidget(progressCircle);
+    ui->loading->setLayout(layout);
+
+
+    connect(webView,&QWebEngineView::loadFinished,[this](int){
+        qDebug()<<"loadFinished";
+        webView->page()->runJavaScript("document.documentElement.outerHTML",QWebEngineScript::ApplicationWorld,[this](const QVariant& data) {
+            qDebug()<<"123123:"<<data.toString();
+            sideModel* object = jsonModelList[currentListSelect];
+            resultList = queryHTML(data.toString(),object);
+
+            reloadTableData(resultList);
+            //加载完毕,隐藏loading
+            progressCircle->setHidden(true);
+        });
+    });
+
 
     currentPage = 1;
 
     initTableView();
     initListTableView();
-    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(htmlFinished(QNetworkReply *)));
-
-
-
 
     QPixmap pix(":/img/icon512.png");
     ui->label_pix->setPixmap(pix.scaled(100,100,Qt::KeepAspectRatio));
 
 
-//    QLabel *lbl = new QLabel;
-//    lbl->setFrameRect(QRect(100,100,100,100));
-//    QMovie *movie = new QMovie("/Users/finn/Downloads/giphy.gif");
-//    lbl->setMovie(movie);
-//    movie->start();
-//    lbl->show();
-//    this->layout()->addWidget(lbl);
+    QFileInfo file("rule.json");
+//    QFile openFile(file.absoluteFilePath());
+//    if(file.isFile()){
+//        openFile.remove();
+//    }
 
-//    更新json URL
-//    https://gitee.com/zvj88888888/magnet_qt/raw/master/updates.json
+    HttpClient(RULE_URL).debug(true).success([=](const QString &response) {
+
+    }).fail([](const QString &error, int errorCode) {
+        qDebug() << error << errorCode;
+    }).download(file.absoluteFilePath());
 }
 void MainWindow::initTableView(){
     XTTableView *tableview = ui->tableView;
@@ -52,33 +78,33 @@ void MainWindow::initTableView(){
     QStandardItemModel *model = new QStandardItemModel();
     tableview->setModel(model);//来使用model
 //    model->setHeaderData(0,Qt::Horizontal,"ID");//设置表的column名称；
-    model->setColumnCount(4);    //列
+    model->setColumnCount(3);    //列
 
     //添加数据
-    for(int j=0;j<15;j++)
-    {
-         //写id
-        QStandardItem *itemID = new QStandardItem("hello"+QString::number(j));//QString::number(j)));
-        model->setItem(j,0,itemID);
+//    for(int j=0;j<15;j++)
+//    {
+//         //写id
+//        QStandardItem *itemID = new QStandardItem("hello"+QString::number(j));//QString::number(j)));
+//        model->setItem(j,0,itemID);
 
-        QStandardItem *item2 = new QStandardItem("22222"+QString::number(j));
-        model->setItem(j,1,item2);
+//        QStandardItem *item2 = new QStandardItem("22222"+QString::number(j));
+//        model->setItem(j,1,item2);
 
-        QPushButton * m_button = new QPushButton("打开");
+//        QPushButton * m_button = new QPushButton("打开");
 
-                        //触发下载按钮的槽函数
-        connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
-        m_button->setProperty("row", j);  //为按钮设置row属性
-        m_button->setProperty("fileName", QString::number(j));  //为按钮设置fileName属性
-        //m_button->setProperty("column", col)
+//                        //触发下载按钮的槽函数
+//        connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
+//        m_button->setProperty("row", j);  //为按钮设置row属性
+//        m_button->setProperty("fileName", QString::number(j));  //为按钮设置fileName属性
+//        //m_button->setProperty("column", col)
 
-       ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,3),m_button);
+//       ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,3),m_button);
 
-    }
+//    }
     tableview->setColumnWidth(0,500);
     tableview->setColumnWidth(1,80);
     tableview->setColumnWidth(2,80);
-    tableview->setColumnWidth(3,80);
+//    tableview->setColumnWidth(3,80);
     tableview->showMaximized();
 
     tableview->setContextMenuPolicy(Qt::CustomContextMenu);  //少这句，右键没有任何反应的。
@@ -206,10 +232,10 @@ void MainWindow::onShowOrHideColumn(QAction *action)
 void MainWindow::on_searchButton_clicked(){
 
     resultList.clear();
-//    ui->tableView->setModel(NULL);
-    if(ui->tableView->model() != NULL){
+
+    if(ui->tableView->model() != nullptr){
         delete(ui->tableView->model());
-        ui->tableView->setModel(NULL);
+        ui->tableView->setModel(nullptr);
     }
 //    qDebug() << "search_row:" << currentListSelect;
     sideModel* object = jsonModelList[currentListSelect];
@@ -220,12 +246,12 @@ void MainWindow::on_searchButton_clicked(){
         return;
     }
 
-//    if(ui->searchText->text().isEmpty()){
-//        qDebug() << "搜索关键字为空";
-//        return;
-//    }
-
-    ui->searchText->setText("钢铁侠");
+    if(ui->searchText->text().isEmpty()){
+        qDebug() << "搜索关键字为空";
+        return;
+    }
+    //显示Loading
+    progressCircle->setHidden(false);
 
     QString string = object->source;//object.value("source").toString();
 
@@ -237,16 +263,17 @@ void MainWindow::on_searchButton_clicked(){
     QString url_str = string.replace(QRegExp("XXX"),encode_keyword);
     qDebug()<<"search URL:"<<url_str;
     qDebug()<<"-------";
-//    QString data_str = MainWindow::getHtml(url_str);
 
-//    mutex.lock();
-    if(reply != NULL){
+    webView->setUrl(QUrl(url_str));
 
-        reply->deleteLater();
-        qDebug() << "deleteLater reply";
-    }
+//    HttpClient(QUrl(url_str).fromPercentEncoding(url_str.toUtf8())).debug(true).success([this,object](const QString &response) {
+//        qDebug() << response;
+//        resultList = queryHTML(response,object);
 
-    reply = manager->get(QNetworkRequest(QUrl(url_str)));
+//        reloadTableData(resultList);
+//    }).fail([](const QString &error, int errorCode) {
+//        qDebug() << error << errorCode;
+//    }).get();
 
 }
 
@@ -308,7 +335,7 @@ QList<sideModel*> MainWindow::queryHTML(const QString &html, sideModel * model) 
     xmlXPathFreeContext (context);
 
 
-    if (result_magnet == NULL) {
+    if (result_magnet == nullptr) {
         qDebug()<<"Invalid XQuery ?";
     }
     else {
@@ -451,7 +478,7 @@ void MainWindow::reloadTableData(QList<sideModel*>list){
     ui->tableView->setModel(model);//来使用model
 
 //    model->setHeaderData(0,Qt::Horizontal,"ID");//设置表的column名称；
-    model->setColumnCount(4);    //列
+    model->setColumnCount(3);    //列
 
     //添加数据
     for(int j=0;j<list.length();j++)
@@ -467,21 +494,12 @@ void MainWindow::reloadTableData(QList<sideModel*>list){
         QStandardItem *item_count = new QStandardItem(side->count);
         model->setItem(j,2,item_count);
 
-        QPushButton * m_button = new QPushButton("网盘打开");
 
-                        //触发下载按钮的槽函数
-        connect(m_button, SIGNAL(clicked(bool)), this, SLOT(clickDownloadButton())); //
-        m_button->setProperty("row", j);  //为按钮设置row属性
-        m_button->setProperty("fileName", QString::number(j));  //为按钮设置fileName属性
-        //m_button->setProperty("column", col)
-
-       ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,3),m_button);
 
     }
     ui->tableView->setColumnWidth(0,350);
     ui->tableView->setColumnWidth(1,80);
     ui->tableView->setColumnWidth(2,50);
-    ui->tableView->setColumnWidth(3,80);
     ui->tableView->showMaximized();
 }
 
@@ -500,18 +518,18 @@ void MainWindow::testSlot(){
 
 void MainWindow::clickDownloadButton(){
 
-    QPushButton *btn = (QPushButton *)sender();   //产生事件的对象
-    int row = btn->property("row").toInt();  //取得按钮的行号属性
+//    QPushButton *btn = (QPushButton *)sender();   //产生事件的对象
+//    int row = btn->property("row").toInt();  //取得按钮的行号属性
 //    QString openFileName = btn->property("fileName").toString();  //获取按钮的fileName属性，其他的可以自行添加。
 
-    sideModel * obj_model = resultList[row];
+//    sideModel * obj_model = resultList[row];
 
 //    qDebug() << "click_magnet:" << model->magnet;
 //    qDebug() << "button_row:"<<row << "row:" << ui->tableView->currentIndex().row() << "column:" << ui->tableView->currentIndex().column();
 
-    QString URL = "https://pan.bitqiu.com/promote-invite?mafrom=promote&mipos=cps&uid=110290000&agentdown=" + obj_model->magnet;
-    qDebug() << "url:" << URL;
-    QDesktopServices::openUrl(QUrl(URL));
+//    QString URL = "" + obj_model->magnet;
+//    qDebug() << "url:" << URL;
+//    QDesktopServices::openUrl(QUrl(URL));
 
 }
 

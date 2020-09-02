@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>img/icon512.png</file>
         <file alias="rule">rule.json</file>
+        <file alias="loading">img/loader.png</file>
     </qresource>
 </RCC>
