@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
             //加载完毕,隐藏loading
             progressCircle->setHidden(true);
         });
+//        webView->page()->mainFrame()->documentElement().evaluateJavaScript("...");
     });
 
 
@@ -101,11 +102,19 @@ void MainWindow::initTableView(){
 //       ui->tableView->setIndexWidget(model->index(model->rowCount() - 1,3),m_button);
 
 //    }
-    tableview->setColumnWidth(0,500);
+    tableview->setColumnWidth(0,tableview->size().width()-160);
     tableview->setColumnWidth(1,80);
     tableview->setColumnWidth(2,80);
 //    tableview->setColumnWidth(3,80);
     tableview->showMaximized();
+
+
+    QHeaderView * header = tableview->verticalHeader();//ui->fileTree->header();
+//    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+//    header->setStretchLastSection(false);
+    header->setSectionResizeMode(0, QHeaderView::Stretch);
+    header->setSectionResizeMode(1, QHeaderView::Fixed);
+    header->setSectionResizeMode(2, QHeaderView::Fixed);
 
     tableview->setContextMenuPolicy(Qt::CustomContextMenu);  //少这句，右键没有任何反应的。
 
@@ -497,10 +506,18 @@ void MainWindow::reloadTableData(QList<sideModel*>list){
 
 
     }
-    ui->tableView->setColumnWidth(0,350);
+    ui->tableView->setColumnWidth(0,ui->tableView->size().width()-162);
     ui->tableView->setColumnWidth(1,80);
-    ui->tableView->setColumnWidth(2,50);
+    ui->tableView->setColumnWidth(2,80);
     ui->tableView->showMaximized();
+
+
+    QHeaderView * header = ui->tableView->verticalHeader();//ui->fileTree->header();
+//    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+//    header->setStretchLastSection(false);
+    header->setSectionResizeMode(0, QHeaderView::Stretch);
+    header->setSectionResizeMode(1, QHeaderView::Fixed);
+    header->setSectionResizeMode(2, QHeaderView::Fixed);
 }
 
 void MainWindow::testSlot(){

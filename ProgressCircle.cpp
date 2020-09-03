@@ -195,7 +195,7 @@ QPixmap ProgressCircle::generatePixmap() const
 //    QPixmap pixmap(squared(rect()).size().toSize());
 //    pixmap.fill(QColor(0,0,0,0));
     QPixmap pixmap(QSize(rect().size()));
-    pixmap.load(":/loader");
+    pixmap.load(":/loading");
     QPainter painter(&pixmap);
 //    painter.translate(20,20); //让图片的中心作为旋转的中心
 //    painter.rotate(360.0*mInfiniteAnimationValue); //顺时针旋转90度
