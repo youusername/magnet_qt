@@ -85,9 +85,11 @@ private slots:
     //刷新结果列表的数据
     void reloadTableData(QList<sideModel*>list);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
-
+    QString getTrackerslist();
 
 
     //记录当前选择网站序号

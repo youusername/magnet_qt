@@ -3,5 +3,8 @@
         <file>img/icon512.png</file>
         <file alias="rule">rule.json</file>
         <file alias="loading">img/loader.png</file>
+        <file>icon.icns</file>
+        <file>icon.ico</file>
+        <file>img/donate.png</file>
     </qresource>
 </RCC>
